@@ -40,7 +40,8 @@ function liveStatsInterval(query: { state: { data?: LiveStatsData } }) {
 // the display decides the precision.
 export interface ServerLiveStatsLatest {
   hostCpu: number | null;
-  processCpu: number;
+  // Null when the server reports no process CPU (Silo)
+  processCpu: number | null;
   hostMemory: number | null;
   processMemory: number;
 }

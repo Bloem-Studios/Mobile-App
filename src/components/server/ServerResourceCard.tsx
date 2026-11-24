@@ -27,6 +27,7 @@ const PROCESS_LABELS: Record<ServerType, string> = {
   jellyfin: 'Jellyfin',
   emby: 'Emby',
   tofa: 'tofa',
+  silo: 'Silo',
 };
 
 // An idle media server process sits under 1%, which a whole-number label shows as 0%.
@@ -94,7 +95,8 @@ function Bar({ label, value, color, isTablet }: BarProps) {
 interface ResourceBarProps {
   label: string;
   processLabel: string;
-  processValue: number;
+  // Null when the server reports no figure for its own process (Silo's CPU)
+  processValue: number | null;
   // Null when hidden, or when the source cannot see the host (non-Linux plugin hosts)
   systemValue: number | null;
   icon: LucideIcon;
@@ -112,6 +114,9 @@ function ResourceBar({
   const { t } = useTranslation(['mobile']);
   const gap = isTablet ? 8 : 6;
 
+  // Nothing to draw: a Silo server's CPU in a multi-server view, where host load is hidden
+  if (processValue === null && systemValue === null) return null;
+
   return (
     <View style={{ gap }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -128,12 +133,14 @@ function ResourceBar({
         </Text>
       </View>
 
-      <Bar
-        label={processLabel}
-        value={processValue}
-        color={BAR_COLORS.process}
-        isTablet={isTablet}
-      />
+      {processValue !== null && (
+        <Bar
+          label={processLabel}
+          value={processValue}
+          color={BAR_COLORS.process}
+          isTablet={isTablet}
+        />
+      )}
       {systemValue !== null && (
         <Bar
           label={t('mobile:resources.system', { defaultValue: 'System' })}
