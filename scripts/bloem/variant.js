@@ -21,7 +21,11 @@ function withPluginOptions(plugins, name, options) {
 }
 
 function applyBloemVariant(config) {
-  let plugins = config.plugins ?? [];
+  // PostHog's build steps upload debug files to upstream's PostHog project and fail without
+  // their credentials. Analytics stay off anyway: the build sets no EXPO_PUBLIC_POSTHOG_KEY.
+  let plugins = (config.plugins ?? []).filter(
+    (plugin) => pluginName(plugin) !== 'posthog-react-native/expo'
+  );
   plugins = withPluginOptions(plugins, 'expo-widgets', {
     bundleIdentifier: `${BUNDLE_ID}.widgets`,
     groupIdentifier: APP_GROUP,
