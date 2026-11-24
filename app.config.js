@@ -4,8 +4,14 @@
  */
 
 const baseConfig = require('./app.json');
+const { applyBloemVariant } = require('./scripts/bloem/variant');
 
 module.exports = ({ config }) => {
+  const merged = mergeConfig(config);
+  return process.env.APP_VARIANT === 'bloem' ? applyBloemVariant(merged) : merged;
+};
+
+function mergeConfig(config) {
   // Merge base config with dynamic values
   return {
     ...baseConfig.expo,
@@ -20,4 +26,4 @@ module.exports = ({ config }) => {
       },
     },
   };
-};
+}
